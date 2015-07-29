@@ -29,8 +29,6 @@ func main() {
 	engine.OnRepaint(func() {
 		// fonction triggered à chaque frame
 		// y placer le code qui redessine l'affichage
-		fmt.Println("main: REPAINT")
-		// 1er frame: on affiche l'image "skylon.png"
 		var frame int = engine.GetFrame()
 		if frame == 1 {
 			engine.Blit(skylon)
