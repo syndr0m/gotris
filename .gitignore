@@ -1,0 +1,7 @@
+bin
+pkg
+src/golang.org
+src/github.com
+src/code.google.com
+# personnal stuff
+old
