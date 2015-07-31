@@ -2,22 +2,19 @@ package mygameengine
 
 import (
 	"fmt"
-	"image"
-	"image/color"
-	"image/draw"
+	"mygameengine/doublebuffer"
+	"mygameengine/image"
 	"time"
 )
 
 type MyGameEngine struct {
-	screenWidth  int
-	screenHeight int
-	fps          int
-	frame        int
-	screenBuffer *image.RGBA
-	onKeyDown    func(key int)
-	onKeyUp      func(key int)
-	onRepaint    func()
-	exit         chan int
+	screen    *doublebuffer.DoubleBuffer
+	fps       uint
+	frame     uint64
+	onKeyDown func(key int)
+	onKeyUp   func(key int)
+	onRepaint func()
+	exit      chan int
 }
 
 type LoopFunc func(*MyGameEngine)
@@ -31,25 +28,23 @@ func (engine *MyGameEngine) Run() {
 		panic("MyGameEngine.Run(): onRepaint function must exist")
 	}
 
-	engine.screenBuffer = image.NewRGBA(image.Rectangle{
-		Min: image.Point{X: 0, Y: 0},
-		Max: image.Point{X: engine.screenWidth, Y: engine.screenHeight},
-	})
-
 	// using gxui to open the window
 	commands := make(chan Message)
 	events := make(chan Message)
-	go gxuiOpenWindow(engine.screenWidth, engine.screenHeight, engine.screenBuffer, commands, events)
+	go gxuiOpenWindow(engine.GetScreenImage().GetWidth(), engine.GetScreenImage().GetHeight(), engine.GetScreen(), commands, events)
 
 	// engine-loop rendering
 	ticker := time.NewTicker(time.Millisecond * time.Duration(1000/engine.fps))
 	go func() {
 		for {
 			<-ticker.C
-			fmt.Println("tick", engine.frame)
 			// repaint
 			engine.frame++
+			// game repaint code
 			engine.onRepaint()
+			// switching buffer
+			engine.GetScreen().SwapBuffers()
+			// saving screen on the double buffer
 			commands <- Message{MESSAGE_REPAINT, 0}
 		}
 	}()
@@ -57,8 +52,10 @@ func (engine *MyGameEngine) Run() {
 	go func() {
 		for {
 			var m Message = <-events
+			fmt.Println("EVENT MESSAGE RECEIVED")
 			switch m.name {
 			case MESSAGE_KEY_DOWN:
+				fmt.Println("EVENT MESSAGE DISPATCHED TO KEYDOWN")
 				engine.onKeyDown(m.value)
 			case MESSAGE_EXIT:
 				engine.Stop()
@@ -74,22 +71,22 @@ func (engine *MyGameEngine) Stop() {
 	engine.exit <- 42
 }
 
-func (engine *MyGameEngine) GetFrame() int {
+func (engine *MyGameEngine) GetFrame() uint64 {
 	return engine.frame
 }
 
-func (engine *MyGameEngine) Blit(img image.Image) {
-	draw.Draw(engine.screenBuffer, img.Bounds(), img, image.ZP, draw.Src)
+func (engine *MyGameEngine) GetScreen() *doublebuffer.DoubleBuffer {
+	return engine.screen
 }
 
-func (engine *MyGameEngine) Plot(x int, y int, color color.RGBA) {
-	engine.screenBuffer.SetRGBA(x, y, color)
+func (engine *MyGameEngine) GetScreenImage() *image.Image {
+	return engine.screen.GetCurrentImage()
 }
 
-func New(screenWidth int, screenHeight int, fps int) *MyGameEngine {
+func New(screenWidth uint, screenHeight uint, fps uint) *MyGameEngine {
 	engine := new(MyGameEngine)
-	engine.screenWidth = screenWidth
-	engine.screenHeight = screenHeight
+	// default screen.
+	engine.screen = doublebuffer.New(screenWidth, screenHeight)
 	engine.fps = fps
 	return engine
 }

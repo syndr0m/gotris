@@ -4,14 +4,15 @@ import (
 	"fmt"
 	"github.com/google/gxui"
 	"mygameengine"
+	"mygameengine/image"
 )
 
 func main() {
-	var screenWidth int = 640
-	var screenHeight int = 480
-	var fps int = 25
+	var screenWidth uint = 640
+	var screenHeight uint = 480
+	var fps uint = 25
 
-	skylon, _ := loadImage("skylon.png")
+	skylon, _ := image.Png("skylon.png")
 
 	engine := mygameengine.New(screenWidth, screenHeight, fps)
 	engine.OnKeyDown(func(key int) {
@@ -29,14 +30,12 @@ func main() {
 	engine.OnRepaint(func() {
 		// fonction triggered à chaque frame
 		// y placer le code qui redessine l'affichage
-		var frame int = engine.GetFrame()
-		if frame == 1 {
-			engine.Blit(skylon)
-		}
-		if frame < screenWidth {
-			for y := 0; y < screenHeight; y++ {
-				engine.Plot(frame, y, mygameengine.COLOR_WHITE)
-			}
+		var frame uint64 = engine.GetFrame()
+		if frame < 255 {
+			alpha := uint8(frame)
+			screen := engine.GetScreenImage()
+			screen.Blit(skylon)
+			screen.DrawMask(0, 0, screenWidth, screenHeight, alpha)
 		}
 	})
 	engine.Run()

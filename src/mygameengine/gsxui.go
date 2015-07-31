@@ -1,16 +1,17 @@
 package mygameengine
 
 import (
+	"fmt"
 	"github.com/google/gxui"
 	"github.com/google/gxui/drivers/gl"
 	"github.com/google/gxui/samples/flags"
-	"image"
+	"mygameengine/doublebuffer"
 )
 
-func gxuiOpenWindow(width int, height int, buffer *image.RGBA, commands chan Message, events chan Message) {
+func gxuiOpenWindow(width uint, height uint, dblBuf *doublebuffer.DoubleBuffer, commands chan Message, events chan Message) {
 	gl.StartDriver(func(driver gxui.Driver) {
 		theme := flags.CreateTheme(driver)
-		window := theme.CreateWindow(width, height, "MyGameEngine")
+		window := theme.CreateWindow(int(width), int(height), "MyGameEngine")
 		window.SetScale(flags.DefaultScaleFactor)
 		screen := theme.CreateImage()
 		window.AddChild(screen)
@@ -19,6 +20,7 @@ func gxuiOpenWindow(width int, height int, buffer *image.RGBA, commands chan Mes
 			events <- Message{MESSAGE_EXIT, 0}
 		})
 		window.OnKeyDown(func(e gxui.KeyboardEvent) {
+			fmt.Println("keydown") // FIXME: without this line, randomly crash ...
 			events <- Message{MESSAGE_KEY_DOWN, int(e.Key)}
 		})
 
@@ -28,7 +30,7 @@ func gxuiOpenWindow(width int, height int, buffer *image.RGBA, commands chan Mes
 				<-commands
 				last := screen.Texture()
 				driver.CallSync(func() {
-					texture := driver.CreateTexture(buffer, 1)
+					texture := driver.CreateTexture(dblBuf.GetPreviousImage().GetBuffer(), 1)
 					screen.SetTexture(texture)
 					if last != nil {
 						last.Release()
