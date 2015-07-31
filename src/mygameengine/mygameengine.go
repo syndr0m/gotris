@@ -8,24 +8,18 @@ import (
 )
 
 type MyGameEngine struct {
-	screen    *doublebuffer.DoubleBuffer
-	fps       uint
-	frame     uint64
-	onKeyDown func(key int)
-	onKeyUp   func(key int)
-	onRepaint func()
-	exit      chan int
+	screen *doublebuffer.DoubleBuffer
+	fps    uint
+	frame  uint64
+	board  *Board
+	exit   chan int
 }
 
 type LoopFunc func(*MyGameEngine)
 
-func (engine *MyGameEngine) OnKeyDown(f func(key int)) { engine.onKeyDown = f }
-func (engine *MyGameEngine) OnKeyUp(f func(key int))   { engine.onKeyUp = f }
-func (engine *MyGameEngine) OnRepaint(f func())        { engine.onRepaint = f }
-
 func (engine *MyGameEngine) Run() {
-	if engine.onRepaint == nil {
-		panic("MyGameEngine.Run(): onRepaint function must exist")
+	if engine.board == nil {
+		panic("MyGameEngine.Run(): create a board before Run()")
 	}
 
 	// using gxui to open the window
@@ -41,7 +35,7 @@ func (engine *MyGameEngine) Run() {
 			// repaint
 			engine.frame++
 			// game repaint code
-			engine.onRepaint()
+			engine.board.Repaint()
 			// switching buffer
 			engine.GetScreen().SwapBuffers()
 			// saving screen on the double buffer
@@ -56,7 +50,7 @@ func (engine *MyGameEngine) Run() {
 			switch m.name {
 			case MESSAGE_KEY_DOWN:
 				fmt.Println("EVENT MESSAGE DISPATCHED TO KEYDOWN")
-				engine.onKeyDown(m.value)
+				engine.board.KeyDown(m.value)
 			case MESSAGE_EXIT:
 				engine.Stop()
 			}
@@ -83,6 +77,19 @@ func (engine *MyGameEngine) GetScreenImage() *image.Image {
 	return engine.screen.GetCurrentImage()
 }
 
+// boards
+func (engine *MyGameEngine) NewBoard() *Board {
+	return NewBoard()
+}
+func (engine *MyGameEngine) SetCurrentBoard(board *Board) {
+	if engine.board != nil {
+		engine.board.Stop()
+	}
+	engine.board = board
+	board.Start()
+}
+
+//
 func New(screenWidth uint, screenHeight uint, fps uint) *MyGameEngine {
 	engine := new(MyGameEngine)
 	// default screen.
