@@ -1,9 +1,7 @@
 package main
 
 import (
-	"fmt"
 	"mygameengine"
-	"mygameengine/image"
 )
 
 func main() {
@@ -11,21 +9,8 @@ func main() {
 	var screenHeight uint = 480
 	var fps uint = 25
 
-	skylon, _ := image.Png("skylon.png")
-
 	engine := mygameengine.New(screenWidth, screenHeight, fps)
-
-	intro := engine.NewBoard()
-	intro.OnKeyDown(func(key int) { fmt.Println("main: KEY DOWN") })
-	intro.OnRepaint(func() {
-		frame := intro.GetFrame()
-		if frame < 255 {
-			alpha := uint8(frame)
-			screen := engine.GetScreenImage()
-			screen.Blit(skylon)
-			screen.DrawMask(0, 0, screenWidth, screenHeight, alpha)
-		}
-	})
+	intro := NewBoardIntro(engine)
 	engine.SetCurrentBoard(intro)
 	engine.Run()
 }

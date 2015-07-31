@@ -35,7 +35,7 @@ func (engine *MyGameEngine) Run() {
 			// repaint
 			engine.frame++
 			// game repaint code
-			engine.board.Repaint()
+			engine.board.Repaint(engine.GetScreenImage())
 			// switching buffer
 			engine.GetScreen().SwapBuffers()
 			// saving screen on the double buffer
