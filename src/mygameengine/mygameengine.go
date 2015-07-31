@@ -69,6 +69,10 @@ func (engine *MyGameEngine) GetFrame() uint64 {
 	return engine.frame
 }
 
+func (engine *MyGameEngine) GetFps() uint {
+	return engine.fps
+}
+
 func (engine *MyGameEngine) GetScreen() *doublebuffer.DoubleBuffer {
 	return engine.screen
 }

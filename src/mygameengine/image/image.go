@@ -27,16 +27,15 @@ func (image *Image) Blit(img *Image) {
 	image.BlitAt(img, 0, 0)
 }
 
-func (image *Image) BlitAt(img *Image, atx uint, aty uint) {
-	var width uint = img.GetWidth()
-	var height uint = img.GetHeight()
+func (image *Image) BlitAt(img *Image, atx int, aty int) {
+	var maxx uint = uint(math.Max(0, math.Min(float64(image.width), float64(atx+int(img.GetWidth())))))
+	var maxy uint = uint(math.Max(0, math.Min(float64(image.height), float64(aty+int(img.GetHeight())))))
+	var minx uint = uint(math.Max(0, math.Min(float64(image.width), float64(atx))))
+	var miny uint = uint(math.Max(0, math.Min(float64(image.height), float64(aty))))
 
-	var maxx uint = uint(math.Min(float64(image.width), float64(atx+width)))
-	var maxy uint = uint(math.Min(float64(image.height), float64(aty+height)))
-
-	for x := atx; x < maxx; x++ {
-		for y := aty; y < maxy; y++ {
-			image.Plot(x, y, img.At(x, y))
+	for x := minx; x < maxx; x++ {
+		for y := miny; y < maxy; y++ {
+			image.Plot(x, y, img.At(uint(int(x)-atx), uint(int(y)-aty)))
 		}
 	}
 }
@@ -46,29 +45,18 @@ func (image *Image) At(x uint, y uint) color.RGBA {
 }
 
 func (image *Image) Plot(x uint, y uint, color color.RGBA) {
-	image.buffer.SetRGBA(int(x), int(y), color)
-}
-
-func (image *Image) Mask(x uint, y uint, alpha uint8) {
 	c := image.At(x, y)
-	c.R = uint8(float64(c.R) * (255 - float64(alpha)) / 255)
-	c.G = uint8(float64(c.G) * (255 - float64(alpha)) / 255)
-	c.B = uint8(float64(c.B) * (255 - float64(alpha)) / 255)
-	image.Plot(x, y, c)
+	alpha := float64(color.A) / 255
+	c.R = uint8(float64(c.R)*(1-alpha) + float64(color.R)*alpha)
+	c.G = uint8(float64(c.G)*(1-alpha) + float64(color.G)*alpha)
+	c.B = uint8(float64(c.B)*(1-alpha) + float64(color.B)*alpha)
+	image.buffer.SetRGBA(int(x), int(y), c)
 }
 
 func (image *Image) DrawRectangle(x1 uint, y1 uint, x2 uint, y2 uint, color color.RGBA) {
 	for x := x1; x < x2; x++ {
 		for y := y1; y < y2; y++ {
 			image.Plot(x, y, color)
-		}
-	}
-}
-
-func (image *Image) DrawMask(x1 uint, y1 uint, x2 uint, y2 uint, alpha uint8) {
-	for x := x1; x < x2; x++ {
-		for y := y1; y < y2; y++ {
-			image.Mask(x, y, alpha)
 		}
 	}
 }
