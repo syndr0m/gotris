@@ -10,7 +10,8 @@ func main() {
 	var fps uint = 25
 
 	engine := mygameengine.New(screenWidth, screenHeight, fps)
-	intro := NewBoardIntro(engine)
-	engine.SetCurrentBoard(intro)
+	engine.Boards().Register("intro", Intro(engine))
+	engine.Boards().Register("game", Game(engine))
+	engine.Boards().SetCurrent(engine.Boards().Get("intro"))
 	engine.Run()
 }
