@@ -11,17 +11,14 @@ type MyGameEngine struct {
 	screen *doublebuffer.DoubleBuffer
 	fps    uint
 	frame  uint64
-	board  *Board
+	boards *Boards
+	assets *Assets
 	exit   chan int
 }
 
 type LoopFunc func(*MyGameEngine)
 
 func (engine *MyGameEngine) Run() {
-	if engine.board == nil {
-		panic("MyGameEngine.Run(): create a board before Run()")
-	}
-
 	// using gxui to open the window
 	commands := make(chan Message)
 	events := make(chan Message)
@@ -35,7 +32,7 @@ func (engine *MyGameEngine) Run() {
 			// repaint
 			engine.frame++
 			// game repaint code
-			engine.board.Repaint(engine.GetScreenImage())
+			engine.Boards().Current().Repaint(engine.GetScreenImage())
 			// switching buffer
 			engine.GetScreen().SwapBuffers()
 			// saving screen on the double buffer
@@ -50,7 +47,7 @@ func (engine *MyGameEngine) Run() {
 			switch m.name {
 			case MESSAGE_KEY_DOWN:
 				fmt.Println("EVENT MESSAGE DISPATCHED TO KEYDOWN")
-				engine.board.KeyDown(m.value)
+				engine.Boards().Current().KeyDown(m.value)
 			case MESSAGE_EXIT:
 				engine.Stop()
 			}
@@ -81,21 +78,14 @@ func (engine *MyGameEngine) GetScreenImage() *image.Image {
 	return engine.screen.GetCurrentImage()
 }
 
-// boards
-func (engine *MyGameEngine) NewBoard() *Board {
-	return NewBoard()
-}
-func (engine *MyGameEngine) SetCurrentBoard(board *Board) {
-	if engine.board != nil {
-		engine.board.Stop()
-	}
-	engine.board = board
-	board.Start()
-}
+func (engine *MyGameEngine) Boards() *Boards { return engine.boards }
+func (engine *MyGameEngine) Assets() *Assets { return engine.assets }
 
 //
 func New(screenWidth uint, screenHeight uint, fps uint) *MyGameEngine {
 	engine := new(MyGameEngine)
+	engine.boards = NewBoards()
+	engine.assets = NewAssets()
 	// default screen.
 	engine.screen = doublebuffer.New(screenWidth, screenHeight)
 	engine.fps = fps
