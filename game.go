@@ -34,9 +34,9 @@ func keyHandler(world *World) func(int) {
 			fmt.Println("rotate right")
 			world.CanRotateRight()
 			world.RotateRight()
-			/*case 58:
+		case 100:
 			world.CanRotateLeft()
-			world.RotateLeft()*/
+			world.RotateLeft()
 		}
 		fmt.Println("game: KEY DOWN", key)
 	}
