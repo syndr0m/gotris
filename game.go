@@ -15,33 +15,26 @@ const IMG_BLOCK_06 string = "assets/images/block-06.png"
 
 const BLOCK_SIZE uint = 27
 
-const KEY_RIGHT int = 57
-const KEY_LEFT int = 58
-const KEY_UP int = 60
-const KEY_DOWN int = 59
-const KEY_CTRL_RIGHT int = 104
-const KEY_CTRL_LEFT int = 100
-const KEY_SPACE int = 1
-
 func keyHandler(world *World) func(int) {
 	return func(key int) {
+		fmt.Println(mygameengine.FOO)
 		switch key {
-		case KEY_RIGHT:
+		case mygameengine.KEY_RIGHT:
 			fmt.Println("move right")
 			world.Right()
-		case KEY_LEFT:
+		case mygameengine.KEY_LEFT:
 			fmt.Println("move left")
 			world.Left()
-		case KEY_DOWN:
+		case mygameengine.KEY_DOWN:
 			fmt.Println("move down")
 			world.Down()
-		case KEY_SPACE:
+		case mygameengine.KEY_SPACE:
 			fmt.Println("drop")
 			world.Drop()
-		case KEY_CTRL_RIGHT, KEY_UP:
+		case mygameengine.KEY_CTRL_RIGHT, mygameengine.KEY_UP:
 			fmt.Println("rotate right")
 			world.RotateRight()
-		case KEY_CTRL_LEFT:
+		case mygameengine.KEY_CTRL_LEFT:
 			world.RotateLeft()
 		}
 		fmt.Println("game: KEY DOWN", key)

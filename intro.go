@@ -43,7 +43,7 @@ func Intro(engine *mygameengine.MyGameEngine) *mygameengine.Board {
 	intro := mygameengine.NewBoard()
 	intro.OnKeyDown(func(key int) {
 		fmt.Println("intro: KEY DOWN", key)
-		if key == 1 {
+		if key == mygameengine.KEY_SPACE {
 			engine.Boards().SetCurrent(engine.Boards().Get("game"))
 		}
 	})
