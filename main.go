@@ -1,7 +1,7 @@
 package main
 
 import (
-	"mygameengine"
+	"github.com/syndr0m/mygameengine"
 )
 
 func main() {

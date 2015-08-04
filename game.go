@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"mygameengine"
-	"mygameengine/image"
+	"github.com/syndr0m/mygameengine"
+	"github.com/syndr0m/mygameengine/image"
 )
 
 const IMG_BLOCK_01 string = "assets/images/block-01.png"

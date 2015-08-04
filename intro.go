@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
+	"github.com/syndr0m/mygameengine"
+	"github.com/syndr0m/mygameengine/image"
 	"math"
-	"mygameengine"
-	"mygameengine/image"
 )
 
 func drawIntroBackground(screen *image.Image, frame uint64, imageIntroRotatingBg *image.Image) {
