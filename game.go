@@ -15,26 +15,33 @@ const IMG_BLOCK_06 string = "assets/images/block-06.png"
 
 const BLOCK_SIZE uint = 27
 
+const KEY_RIGHT int = 57
+const KEY_LEFT int = 58
+const KEY_UP int = 60
+const KEY_DOWN int = 59
+const KEY_CTRL_RIGHT int = 104
+const KEY_CTRL_LEFT int = 100
+
 func keyHandler(world *World) func(int) {
 	return func(key int) {
 		switch key {
-		case 57:
+		case KEY_RIGHT:
 			fmt.Println("move right")
 			world.CanMoveRight()
 			world.Right()
-		case 58:
+		case KEY_LEFT:
 			fmt.Println("move left")
 			world.CanMoveLeft()
 			world.Left()
-		case 59:
+		case KEY_DOWN:
 			fmt.Println("move down")
 			world.CanMoveDown()
 			world.Down()
-		case 104:
+		case KEY_CTRL_RIGHT, KEY_UP:
 			fmt.Println("rotate right")
 			world.CanRotateRight()
 			world.RotateRight()
-		case 100:
+		case KEY_CTRL_LEFT:
 			world.CanRotateLeft()
 			world.RotateLeft()
 		}
@@ -146,6 +153,7 @@ func Game(engine *mygameengine.MyGameEngine) *mygameengine.Board {
 	loadAssets(engine)
 	gameBoard := mygameengine.NewBoard()
 	world := NewWorld()
+	gameBoard.OnStart(world.Start)
 	gameBoard.OnKeyDown(keyHandler(world))
 	gameBoard.OnRepaint(repaintHandler(engine, world))
 	return gameBoard
