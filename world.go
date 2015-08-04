@@ -2,7 +2,7 @@ package main
 
 import (
 	"math/rand"
-	//"time"
+	"time"
 )
 
 const GRID_WIDTH uint = 10
@@ -18,6 +18,7 @@ type World struct {
 	nextPiece     *Piece
 	grid          [] /*Y:17*/ [] /*X:10*/ *Block
 	onDeleted     func(lines uint)
+	timer         *time.Timer
 }
 
 // initialisation
@@ -146,6 +147,7 @@ func (world *World) Down() {
 		world.DeleteLines()
 		world.NextPiece()
 	}
+	world.ResetTimer()
 }
 func (world *World) Right() {
 	if world.CanMoveRight() {
@@ -180,6 +182,27 @@ func (world *World) GetPieceY() int   { return world.currentPieceY }
 // Events
 func (world *World) OnDeleted(f func(uint)) { world.onDeleted = f }
 
+//
+func (world *World) Start() {
+	world.Tick()
+}
+
+func (world *World) ResetTimer() {
+	if world.timer != nil {
+		world.timer.Stop()
+		world.timer = nil
+	}
+	world.timer = time.AfterFunc(
+		time.Millisecond*time.Duration(1000),
+		world.Tick,
+	)
+}
+
+// every tick, we drop a piece, and launch a new Tick
+func (world *World) Tick() {
+	world.Down()
+}
+
 // Creating the world
 func NewWorld() *World {
 	world := new(World)
@@ -188,16 +211,5 @@ func NewWorld() *World {
 	world.lines = 0
 	world.score = 0
 	world.NextPiece()
-
-	// every seconds, we drop a piece
-	/*ticker := time.NewTicker(time.Millisecond * time.Duration(1000))
-	go func() {
-		for {
-			<-ticker.C
-			// down.
-			world.Down()
-		}
-	}()*/
-
 	return world
 }
