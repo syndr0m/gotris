@@ -28,6 +28,22 @@ var PieceL2 Piece = Piece{
 	},
 }
 
+var PieceZ1 Piece = Piece{
+	blocks: [][]*Block{
+		{&Block02, nil, nil},
+		{&Block02, &Block02, nil},
+		{nil, &Block02, nil},
+	},
+}
+
+var PieceZ2 Piece = Piece{
+	blocks: [][]*Block{
+		{nil, nil, &Block02},
+		{nil, &Block02, &Block02},
+		{nil, &Block02, nil},
+	},
+}
+
 var PieceCube Piece = Piece{
 	blocks: [][]*Block{
 		{&Block03, &Block03},

@@ -36,6 +36,7 @@ func (world *World) PickupPiece() *Piece {
 		&PieceL1, &PieceL1,
 		&PieceL2, &PieceL2,
 		&PieceTri, &PieceTri,
+		&PieceZ1, &PieceZ2,
 	}
 	return pieces[rand.Intn(len(pieces))]
 }
