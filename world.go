@@ -161,6 +161,12 @@ func (world *World) Left() {
 		world.currentPieceX--
 	}
 }
+func (world *World) Drop() {
+	for world.CanMoveDown() {
+		world.currentPieceY++
+	}
+	world.Down()
+}
 func (world *World) RotateRight() {
 	if world.CanRotateRight() {
 		world.currentPiece.RotateRight()

@@ -21,28 +21,27 @@ const KEY_UP int = 60
 const KEY_DOWN int = 59
 const KEY_CTRL_RIGHT int = 104
 const KEY_CTRL_LEFT int = 100
+const KEY_SPACE int = 1
 
 func keyHandler(world *World) func(int) {
 	return func(key int) {
 		switch key {
 		case KEY_RIGHT:
 			fmt.Println("move right")
-			world.CanMoveRight()
 			world.Right()
 		case KEY_LEFT:
 			fmt.Println("move left")
-			world.CanMoveLeft()
 			world.Left()
 		case KEY_DOWN:
 			fmt.Println("move down")
-			world.CanMoveDown()
 			world.Down()
+		case KEY_SPACE:
+			fmt.Println("drop")
+			world.Drop()
 		case KEY_CTRL_RIGHT, KEY_UP:
 			fmt.Println("rotate right")
-			world.CanRotateRight()
 			world.RotateRight()
 		case KEY_CTRL_LEFT:
-			world.CanRotateLeft()
 			world.RotateLeft()
 		}
 		fmt.Println("game: KEY DOWN", key)
