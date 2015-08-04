@@ -189,6 +189,10 @@ func Game(engine *mygameengine.MyGameEngine) *mygameengine.Board {
 	loadAssets(engine)
 	gameBoard := mygameengine.NewBoard()
 	world := NewWorld()
+	world.OnGameOver(func() {
+		world.Stop()
+		engine.Boards().SetCurrent(engine.Boards().Get("intro"))
+	})
 	gameBoard.OnStart(world.Start)
 	gameBoard.OnKeyDown(keyHandler(world))
 	gameBoard.OnRepaint(repaintHandler(engine, world))

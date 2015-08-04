@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"math/rand"
 	"time"
 )
@@ -18,6 +19,7 @@ type World struct {
 	nextPiece     *Piece
 	grid          [] /*Y:17*/ [] /*X:10*/ *Block
 	onDeleted     func(lines uint)
+	onGameOver    func()
 	timer         *time.Timer
 }
 
@@ -26,6 +28,14 @@ func (world *World) InitGrid() {
 	world.grid = make([][]*Block, GRID_HEIGHT)
 	for y := uint(0); y < GRID_HEIGHT; y++ {
 		world.grid[y] = make([]*Block, GRID_WIDTH)
+	}
+}
+
+func (world *World) ClearGrid() {
+	for y := uint(0); y < GRID_HEIGHT; y++ {
+		for x := uint(0); x < GRID_WIDTH; x++ {
+			world.grid[y][x] = nil
+		}
 	}
 }
 
@@ -43,8 +53,13 @@ func (world *World) PickupPiece() *Piece {
 func (world *World) NextPiece() {
 	world.currentPiece = world.nextPiece
 	world.nextPiece = world.PickupPiece()
-	world.currentPieceX = 5
+	world.currentPieceX = 4
 	world.currentPieceY = 0
+	if world.currentPiece != nil &&
+		world.Collide(world.currentPiece, world.currentPieceX, world.currentPieceY) &&
+		world.onGameOver != nil {
+		world.onGameOver()
+	}
 }
 func (world *World) Collide(piece *Piece, x int, y int) bool {
 	pieceBlocks := piece.GetBlocks()
@@ -144,12 +159,13 @@ func (world *World) CanRotateLeft() bool {
 func (world *World) Down() {
 	if world.CanMoveDown() {
 		world.currentPieceY++
+		world.ResetTimer()
 	} else {
 		world.AttachPieceToGrid(world.currentPiece, world.currentPieceX, world.currentPieceY)
 		world.DeleteLines()
+		world.ResetTimer()
 		world.NextPiece()
 	}
-	world.ResetTimer()
 }
 func (world *World) Right() {
 	if world.CanMoveRight() {
@@ -191,10 +207,21 @@ func (world *World) GetNextPiece() *Piece { return world.nextPiece }
 
 // Events
 func (world *World) OnDeleted(f func(uint)) { world.onDeleted = f }
+func (world *World) OnGameOver(f func())    { world.onGameOver = f }
 
 //
 func (world *World) Start() {
+	world.ClearGrid()
+	world.level = 1
+	world.lines = 0
+	world.score = 0
+	world.NextPiece()
+	world.NextPiece()
 	world.Tick()
+}
+
+func (world *World) Stop() {
+	world.timer.Stop()
 }
 
 func (world *World) ResetTimer() {
@@ -210,6 +237,7 @@ func (world *World) ResetTimer() {
 
 // every tick, we drop a piece, and launch a new Tick
 func (world *World) Tick() {
+	fmt.Println("tick")
 	world.Down()
 }
 
@@ -217,10 +245,5 @@ func (world *World) Tick() {
 func NewWorld() *World {
 	world := new(World)
 	world.InitGrid()
-	world.level = 1
-	world.lines = 0
-	world.score = 0
-	world.NextPiece()
-	world.NextPiece()
 	return world
 }
