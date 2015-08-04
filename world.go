@@ -40,7 +40,8 @@ func (world *World) PickupPiece() *Piece {
 	return pieces[rand.Intn(len(pieces))]
 }
 func (world *World) NextPiece() {
-	world.currentPiece = world.PickupPiece()
+	world.currentPiece = world.nextPiece
+	world.nextPiece = world.PickupPiece()
 	world.currentPieceX = 5
 	world.currentPieceY = 0
 }
@@ -179,6 +180,8 @@ func (world *World) GetPiece() *Piece { return world.currentPiece }
 func (world *World) GetPieceX() int   { return world.currentPieceX }
 func (world *World) GetPieceY() int   { return world.currentPieceY }
 
+func (world *World) GetNextPiece() *Piece { return world.nextPiece }
+
 // Events
 func (world *World) OnDeleted(f func(uint)) { world.onDeleted = f }
 
@@ -210,6 +213,7 @@ func NewWorld() *World {
 	world.level = 1
 	world.lines = 0
 	world.score = 0
+	world.NextPiece()
 	world.NextPiece()
 	return world
 }

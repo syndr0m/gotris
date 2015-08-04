@@ -100,6 +100,42 @@ func drawGameCurrentPiece(screen *image.Image, world *World, engine *mygameengin
 	}
 }
 
+func drawGameNextPiece(screen *image.Image, world *World, engine *mygameengine.MyGameEngine) {
+	piece := world.GetNextPiece()
+	pieceBlocks := piece.GetBlocks()
+	pieceSize := piece.GetSize()
+
+	marginLeft := uint(15)
+	marginTop := uint(8)
+	width := uint(6)
+
+	// border
+	for y := uint(0); y < width; y++ {
+		for x := uint(0); x < width; x++ {
+			if x == 0 || y == 0 || x == 5 || y == 5 {
+				screen.BlitAt(
+					engine.Assets().Get(IMG_BLOCK_05),
+					int(BLOCK_SIZE*marginLeft+uint(x)*BLOCK_SIZE),
+					int(BLOCK_SIZE*marginTop+uint(y)*BLOCK_SIZE),
+				)
+			}
+		}
+	}
+	// piece
+	for y := uint(0); y < pieceSize; y++ {
+		for x := uint(0); x < pieceSize; x++ {
+			if pieceBlocks[y][x] != nil {
+				image := blockToImage(pieceBlocks[y][x], engine)
+				screen.BlitAt(
+					image,
+					int(BLOCK_SIZE*(marginLeft+1)+uint(x)*BLOCK_SIZE),
+					int(BLOCK_SIZE*(marginTop+1)+uint(y)*BLOCK_SIZE),
+				)
+			}
+		}
+	}
+}
+
 func drawGameFlash(screen *image.Image, flash int) {
 	white := mygameengine.COLOR_WHITE
 	white.A = uint8(25 * flash)
@@ -118,6 +154,7 @@ func repaintHandler(engine *mygameengine.MyGameEngine, world *World) func(*image
 		drawGameGrid(screen, world, engine)
 		drawGameGridBorders(screen, world, engine)
 		drawGameCurrentPiece(screen, world, engine)
+		drawGameNextPiece(screen, world, engine)
 		// flash effect on line deletion
 		if flash > 0 {
 			drawGameFlash(screen, flash)
