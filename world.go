@@ -107,7 +107,7 @@ func (world *World) DeleteLines() uint {
 		}
 	}
 	// Event
-	if world.onDeleted != nil {
+	if world.onDeleted != nil && lines > 0 {
 		world.onDeleted(lines)
 	}
 	//

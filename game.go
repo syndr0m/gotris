@@ -93,12 +93,29 @@ func drawGameCurrentPiece(screen *image.Image, world *World, engine *mygameengin
 	}
 }
 
+func drawGameFlash(screen *image.Image, flash int) {
+	white := mygameengine.COLOR_WHITE
+	white.A = uint8(25 * flash)
+	screen.DrawRectangle(0, 0, 640, 480, white)
+}
+
 func repaintHandler(engine *mygameengine.MyGameEngine, world *World) func(*image.Image) {
+	// flash effect setup
+	flash := 0
+	world.OnDeleted(func(lines uint) {
+		flash = 10
+	})
+
 	return func(screen *image.Image) {
 		drawGameBackground(screen)
 		drawGameGrid(screen, world, engine)
 		drawGameGridBorders(screen, world, engine)
 		drawGameCurrentPiece(screen, world, engine)
+		// flash effect on line deletion
+		if flash > 0 {
+			drawGameFlash(screen, flash)
+			flash--
+		}
 	}
 }
 
@@ -129,7 +146,6 @@ func Game(engine *mygameengine.MyGameEngine) *mygameengine.Board {
 	loadAssets(engine)
 	gameBoard := mygameengine.NewBoard()
 	world := NewWorld()
-	world.OnDeleted(func(lines uint) { fmt.Println("deleted ", lines) })
 	gameBoard.OnKeyDown(keyHandler(world))
 	gameBoard.OnRepaint(repaintHandler(engine, world))
 	return gameBoard
