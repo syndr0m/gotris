@@ -1,27 +1,33 @@
-# Description
+Description
+===========
 
+Tetris-like in golang (POC)
 
-# Install
+Install
+===========
 
-
-# Prerequisites
+Prerequisites
+---------------
 
 you need go, git and mercurial installed
 
-# Installing dependencies
+Installing dependencies
+---------------
 
 ```
 go get -u github.com/google/gxui/...
 go get -u github.com/syndr0m/mygameengine/...
 ```
 
-# Build
+Build
+-------
 
 ```
 go build
 ```
  
-# Screenshots
+Screenshots
+-----------
 
 ![intro](https://raw.github.com/syndr0m/gotris/master/screenshots/intro.jpg)
 
